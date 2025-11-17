@@ -1,18 +1,15 @@
-@import url('https://fonts.googleapis.com/css2?family=BBH+Sans+Hegarty&family=Bitcount+Grid+Single+Ink:wght@100..900&display=swap');
-
-
-@import url('https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@200..900&display=swap');
-
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;800&display=swap');
 
 body {
-  font-family: "Noto Serif JP", serif;
- /* font-family: "BBH Sans Hegarty", sans-serif; */
-  font-optical-sizing: auto;
-  font-weight: weight;
-  font-style: normal;
-  background-color: brown;
-  color: turquoise;
+  font-family: 'Poppins', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  margin: 0;
+  color: #ffffff;
+  background: #000;
 }
+
+/* Site header/title centered */
+.site-header { display:flex; justify-content:center; align-items:center; height:30vh; }
+.site-title { margin:0; font-size:4rem; letter-spacing:0.08em; text-align:center; color:#fff; }
 
 /* Weather widget styles */
 #weather-widget {
@@ -74,10 +71,28 @@ body {
 .weather-content { display: block; }
 .weather-card { display: flex; gap: 12px; align-items: flex-start; }
 .wc-left { flex: 0 0 auto; }
-.wc-image { width: 200px; height: 140px; border-radius: 6px; display:block; background-size: cover; background-position: center; background-repeat: no-repeat; }
+.wc-image { width: 200px; height: 140px; border-radius: 6px; display:block; background-size: cover; background-position: center; background-repeat: no-repeat; opacity:0.85 }
 .wc-right { flex: 1 1 auto; }
 
 @media (max-width: 640px) {
   .weather-card { flex-direction: column; }
   .wc-image { width: 100%; }
 }
+
+/* Background animation (full-viewport) */
+#background-anim { position: fixed; inset: 0; z-index: -1; overflow: hidden; }
+.bg-slide { position: absolute; inset: 0; background-size: cover; background-position: center; background-repeat: no-repeat; opacity: 0; animation: bgfade 9s linear infinite; }
+.bg-slide:nth-child(1) { animation-delay: 0s; }
+.bg-slide:nth-child(2) { animation-delay: 3s; }
+.bg-slide:nth-child(3) { animation-delay: 6s; }
+
+@keyframes bgfade {
+  0% { opacity: 0; transform: scale(1.02); }
+  8% { opacity: 1; transform: scale(1); }
+  33% { opacity: 1; transform: scale(1); }
+  41% { opacity: 0; transform: scale(0.98); }
+  100% { opacity: 0; }
+}
+
+/* Lower overall background visibility to keep text readable */
+#background-anim::after { content: ''; position: absolute; inset: 0; background: rgba(0,0,0,0.45); pointer-events: none; }
