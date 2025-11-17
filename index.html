@@ -10,7 +10,7 @@
    YESSSSS HI
    <br>
 
-   <img src="path/to/qrCode.png" style="width: 200px; height: 200px;" alt="CLICK ME">
+   <img src="qrCode.png" style="width: 200px; height: 200px;" alt="CLICK ME">
     
    <br>
 
@@ -25,8 +25,8 @@
     <div class="weather-box">
       <!-- Replaced embedding with a user-hosted image plus a small API-driven weather card. -->
       <div class="weather-content">
-        <!-- Replace this URL with your raw GitHub URL if you have one. -->
-        <img id="tree-image" src="https://raw.githubusercontent.com/github/explore/main/topics/tree/tree.png" alt="Tree" width="300" />
+        <!-- Use a local image file: place your image (e.g. tree.png) in the project folder and update the filename if needed -->
+          <div id="tree-image" data-src="./20250729_104959.jpg" style="display:none"></div>
         <!-- Live API-based weather (MET Norway) -->
         <div id="weather-api" aria-live="polite">
           Laster værdata...
@@ -45,9 +45,9 @@
       const lat = 64.3078481;
       const lon = -21.5692736;
       const el = document.getElementById('weather-api');
-      const imageEl = document.getElementById('tree-image');
-      // You can replace this with your own raw GitHub URL.
-      const imageUrl = imageEl && imageEl.src;
+  const imageEl = document.getElementById('tree-image');
+  // You can replace this with your own raw GitHub URL by setting the `data-src` attribute on #tree-image.
+  const imageUrl = imageEl && imageEl.dataset && imageEl.dataset.src;
       if (!el) return;
 
       function render(data) {
@@ -79,7 +79,7 @@
           el.innerHTML = `
             <div class="weather-card">
               <div class="wc-left">
-                <img src="${imageUrl}" alt="Tree" class="wc-image"/>
+                <div class="wc-image" style="background-image: url('${imageUrl}')" aria-hidden="true"></div>
               </div>
               <div class="wc-right">
                 <div class="weather-row"><strong>Gjelder fra: ${timeLabel}</strong></div>
