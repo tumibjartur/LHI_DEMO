@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>REAL</title>
+     <link rel="stylesheet" href="style.css">    
+</head>
+<body>
+   YESSSSS HI
+   <br>
+
+   <img src="path/to/qrCode.png" style="width: 200px; height: 200px;" alt="CLICK ME">
+    
+   <br>
+
+
+  <a href="https://branduglastudio.is" target="_blank">Click here</a> for the official website.
+
+  <br>
+
+  <!-- Weather widget for Meðalfellsvatn, Kjós (from yr.no) -->
+  <section id="weather-widget">
+    <h2>Veður — Meðalfellsvatn (Kjós)</h2>
+    <div class="weather-box">
+      <!-- Replaced embedding with a user-hosted image plus a small API-driven weather card. -->
+      <div class="weather-content">
+        <!-- Replace this URL with your raw GitHub URL if you have one. -->
+        <img id="tree-image" src="https://raw.githubusercontent.com/github/explore/main/topics/tree/tree.png" alt="Tree" width="300" />
+        <!-- Live API-based weather (MET Norway) -->
+        <div id="weather-api" aria-live="polite">
+          Laster værdata...
+        </div>
+      </div>
+      <div class="weather-fallback">
+        Forecast not embedded? Open the forecast on <a href="https://www.yr.no/nb/v%C3%A6rvarsel/daglig-tabell/2-3414607/Island/H%C3%B6fu%C3%B0borgarsv%C3%A6%C3%B0i%C3%B0/Kj%C3%B3sarhreppur/Me%C3%B0alfellsvatn" target="_blank" rel="noopener">yr.no — Meðalfellsvatn</a>.
+      </div>
+      <p class="weather-credit">Source: <a href="https://www.yr.no/">yr.no</a> — NRK / Meteorologisk institutt</p>
+    </div>
+  </section>
+
+  <script>
+    (function(){
+      // Coordinates for Meðalfellsvatn (from earlier shortlink)
+      const lat = 64.3078481;
+      const lon = -21.5692736;
+      const el = document.getElementById('weather-api');
+      const imageEl = document.getElementById('tree-image');
+      // You can replace this with your own raw GitHub URL.
+      const imageUrl = imageEl && imageEl.src;
+      if (!el) return;
+
+      function render(data) {
+        try {
+          const timeseries = data.properties && data.properties.timeseries;
+          if (!timeseries || !timeseries.length) throw new Error('No timeseries in response');
+
+          const now = new Date();
+          // Choose the timeseries entry closest to 'now' (nearest timestamp) so the displayed time updates each fetch
+          let item = timeseries.reduce((best, cur) => {
+            const bestDiff = Math.abs(new Date(best.time) - now);
+            const curDiff = Math.abs(new Date(cur.time) - now);
+            return curDiff < bestDiff ? cur : best;
+          }, timeseries[0]);
+
+          const instant = item.data.instant && item.data.instant.details;
+          const next1 = item.data.next_1_hours && item.data.next_1_hours.details;
+          const next1sum = item.data.next_1_hours && item.data.next_1_hours.summary;
+          const next6sum = item.data.next_6_hours && item.data.next_6_hours.summary;
+
+          const temp = instant && instant.air_temperature;
+          const wind = instant && instant.wind_speed;
+          const precip = (next1 && (next1.precipitation_amount || next1.precipitation)) || 0;
+          const symbol = (next1sum && next1sum.symbol_code) || (next6sum && next6sum.symbol_code) || 'unknown';
+
+          const timeLabel = new Date(item.time).toLocaleString();
+          const fetchedAt = new Date().toLocaleString();
+
+          el.innerHTML = `
+            <div class="weather-card">
+              <div class="wc-left">
+                <img src="${imageUrl}" alt="Tree" class="wc-image"/>
+              </div>
+              <div class="wc-right">
+                <div class="weather-row"><strong>Gjelder fra: ${timeLabel}</strong></div>
+                <div class="weather-row">Temperatur: <strong>${temp != null ? temp.toFixed(1) + ' °C' : '—'}</strong></div>
+                <div class="weather-row">Vind: <strong>${wind != null ? wind.toFixed(1) + ' m/s' : '—'}</strong></div>
+                <div class="weather-row">Nedbør (1h): <strong>${precip ? precip + ' mm' : '0 mm'}</strong></div>
+                <div class="weather-row">Symbol: <strong>${symbol}</strong></div>
+                <div class="weather-note">Kilde: MET Norway / api.met.no</div>
+                <div class="weather-updated">Oppdatert: ${fetchedAt}</div>
+              </div>
+            </div>
+          `;
+        } catch (err) {
+          el.textContent = 'Kunne ikke tolke værdata: ' + err.message;
+        }
+      }
+
+      function fetchWeather() {
+        const url = `https://api.met.no/weatherapi/locationforecast/2.0/compact?lat=${lat}&lon=${lon}`;
+        // Fetch the compact location forecast from MET Norway
+        fetch(url, {cache: 'no-store'})
+          .then(resp => {
+            if (!resp.ok) throw new Error('Network response was not ok');
+            return resp.json();
+          })
+          .then(data => render(data))
+          .catch(err => {
+            el.innerHTML = `Kunne ikke hente værdata direkte (API). Bruk fallback-lenken ovenfor. <br><small>${err.message}</small>`;
+          });
+      }
+
+      // Initial fetch
+      fetchWeather();
+      // Refresh every 15 minutes (900000 ms)
+      setInterval(fetchWeather, 15 * 60 * 1000);
+    })();
+  </script>
+
+</body>
+
+</html>
